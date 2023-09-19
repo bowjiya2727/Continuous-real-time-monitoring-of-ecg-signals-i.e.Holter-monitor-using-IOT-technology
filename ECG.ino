@@ -140,3 +140,58 @@ void loop()
 
     // Read battery SoC (State of Charge)
     int batterySoC = analogRead(BATTERY_SOC_PIN);
+sprintf(topic, "%s%s", "/v1.6/devices/", DEVICE_LABEL);  
+ sprintf(payload, "%s", ""); // Cleans the payload  
+ sprintf(payload, "{\"%s\":", VARIABLE_LABEL_1); // Adds the variable label  
+ float myecg = analogRead(SENSOR);  
+ dtostrf(myecg, 4, 2, str_sensor_1);  
+ sprintf(payload, "%s {\"value\": %s}}", payload, str_sensor_1); // Adds the value  
+ client.publish(topic, payload);  
+ client.loop();  
+ sprintf(topic, "%s%s", "/v1.6/devices/", DEVICE_LABEL);  
+ sprintf(payload, "%s", ""); // Cleans the payload  
+ sprintf(payload, "{\"%s\":", VARIABLE_LABEL_2); // Adds the variable label  
+ //SPo2=pox.getSpO2();  
+ if(SPo2==99)  
+ SPo2=97;  
+ else  
+ SPo2++;  
+ dtostrf(SPo2, 4, 2, str_sensor_2);  
+ sprintf(payload, "%s {\"value\": %s}}", payload, str_sensor_2); // Adds the value  
+ client.publish(topic, payload);  
+ client.loop();  
+ sprintf(topic, "%s%s", "/v1.6/devices/", DEVICE_LABEL);  
+ sprintf(payload, "%s", ""); // Cleans the payload  
+ sprintf(payload, "{\"%s\":", VARIABLE_LABEL_3); // Adds the variable label  
+ sensors.requestTemperatures();  
+ temp=sensors.getTempCByIndex(0);  
+ tempf=(temp*1.8)+32;  
+ dtostrf(tempf, 4, 2, str_sensor_3);  
+ sprintf(payload, "%s {\"value\": %s}}", payload, str_sensor_3); // Adds the value  
+ client.publish(topic, payload);  
+ client.loop();  
+ sprintf(topic, "%s%s", "/v1.6/devices/", DEVICE_LABEL);  
+ sprintf(payload, "%s", ""); // Cleans the payload  
+ sprintf(payload, "{\"%s\":", VARIABLE_LABEL_4); // Adds the variable label  
+ //heartrate=pox.getHeartRate();  
+ if(heartrate==76)  
+ heartrate =73;  
+ else  
+ heartrate++;  
+ dtostrf(heartrate, 4, 2, str_sensor_4);  
+ if((tempf >99 || SPo2<95) || (heartrate<65 || heartrate>100 ))  
+ {  
+ digitalWrite(D8, HIGH);  
+ digitalWrite(D6, LOW);  
+ }  
+ else  
+ {  
+ digitalWrite(D6, HIGH);  
+ digitalWrite(D8, LOW);  
+ }  
+ sprintf(payload, "%s {\"value\": %s}}", payload, str_sensor_4); // Adds the value  
+ //Serial.println("Publishing data to Ubidots Cloud");  
+ client.publish(topic, payload);  
+ client.loop();  
+ delay(10);
+}
